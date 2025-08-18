@@ -1,31 +1,50 @@
+using System.Collections;
+using UnityEditor.XR;
 using UnityEngine;
 
 public class Collectable : MonoBehaviour
 {
-    private SpriteRenderer sprite;
-    private bool playerNotReached = false;
-    private bool playerTouched = true;
+    [SerializeField] float delayForDestroy = 0.4f;
+    [SerializeField] float waitForPlayer = 0.5f;
+    SpriteRenderer sprite;
+    bool playerNotReached = false;
+    bool playerTouched = true;
 
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         sprite = GetComponent<SpriteRenderer>();
     }
 
-    
+    // Update is called once per frame
     void Update()
     {
-        
-    }
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        playerNotReached = true;
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            Debug.Log("player touched the coin");
-            playerTouched = true;
-            sprite.enabled = false;
-            Destroy(gameObject, 0.5f);//right now I'm not sure if it should be destroyed or not, we'll see later when doing the pick up logic.
-        }
+
     }
 
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Player") && !playerNotReached)
+        {
+            playerTouched = true;
+            sprite.color = Color.green;
+            Destroy(gameObject, delayForDestroy);
+            return;
+        }
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            StartCoroutine(DelayDestruction());
+        }
+    }
+    IEnumerator DelayDestruction()
+    {
+        yield return new WaitForSeconds(waitForPlayer);
+        if (!playerTouched)
+        {
+            playerNotReached = true;
+            sprite.color = Color.red;
+            Destroy(gameObject, delayForDestroy);
+        }
+    }
 }
