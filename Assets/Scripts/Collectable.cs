@@ -11,10 +11,9 @@ public class Collectable : MonoBehaviour
         sprite = GetComponent<SpriteRenderer>();
     }
 
-    
     void Update()
     {
-        
+
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
