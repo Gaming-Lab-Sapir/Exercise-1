@@ -1,30 +1,49 @@
+using System.Collections;
 using UnityEngine;
-
 public class Collectable : MonoBehaviour
 {
+    [SerializeField] private float waitForPlayer = 3f;     
+    [SerializeField] private float delayForDestroy = 0.05f;  
     private SpriteRenderer sprite;
     private bool playerNotReached = false;
-    private bool playerTouched = true;
+    private bool playerTouched = false;
 
     void Start()
     {
         sprite = GetComponent<SpriteRenderer>();
     }
-
-    void Update()
-    {
-
-    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        playerNotReached = true;
-        if (collision.gameObject.CompareTag("Player"))
+        if (!collision.CompareTag("Player") || playerNotReached)
         {
-            Debug.Log("player touched the coin");
+            return;
+        }
+
+        var player = collision.GetComponent<PlayerController>();
+
+        if (player != null)
+        {
+            player.AddCoins();
             playerTouched = true;
-            sprite.enabled = false;
-            Destroy(gameObject, 0.5f);//right now I'm not sure if it should be destroyed or not, we'll see later when doing the pick up logic.
+            sprite.color = Color.green;
+            Destroy(gameObject, delayForDestroy);
         }
     }
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            StartCoroutine(DelayDestruction());
+        }
+    }
+    IEnumerator DelayDestruction()
+    {
+        yield return new WaitForSeconds(waitForPlayer);
 
+        if (!playerTouched)
+        {
+            playerNotReached = true;
+            Destroy(gameObject, delayForDestroy);
+        }
+    }
 }
