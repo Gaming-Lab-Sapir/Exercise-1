@@ -4,7 +4,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float speed = 10f;
     [SerializeField] private float jumpSpeed = 6f;
-
+    [SerializeField] private int coins = 0;
     private bool isGrounded;
     private float directionX;
     private Rigidbody2D rb;
@@ -52,10 +52,16 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Ground"))
             isGrounded = false;
     }
+  
+    public void AddCoins()
+    {
+        coins += 1;
+        Debug.Log($"Coins: {coins}");
+    }
 
     enum Movements
     {
         Horizontal,
         Vertical
-    }
+    } 
 }

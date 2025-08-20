@@ -4,13 +4,12 @@ using UnityEngine;
 public class collectableSponer : MonoBehaviour
 {
     [SerializeField] GameObject collectablePrefab;
-    [SerializeField] int spawnAmount = 10;
-    [SerializeField] float spawnDelayMin = 0.1f;
-    [SerializeField] float spawnDelayMax = 0.5f;
+    [SerializeField] int spawnAmount = 30;
+    [SerializeField] float spawnDelayMin = 0.5f;
+    [SerializeField] float spawnDelayMax = 2f;
     [SerializeField] Transform minBound;
     [SerializeField] Transform maxBound;
      
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         StartCoroutine(SpawnCoinsOverTime());
