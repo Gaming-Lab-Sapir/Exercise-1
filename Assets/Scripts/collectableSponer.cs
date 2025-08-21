@@ -4,7 +4,7 @@ using UnityEngine;
 public class collectableSponer : MonoBehaviour
 {
     [SerializeField] GameObject collectablePrefab;
-    [SerializeField] int spawnAmount = 30;
+    [SerializeField] int spawnAmount = 50;
     [SerializeField] float spawnDelayMin = 0.5f;
     [SerializeField] float spawnDelayMax = 2f;
     [SerializeField] Transform minBound;

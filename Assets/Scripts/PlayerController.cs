@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
+using TMPro;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float speed = 10f;
     [SerializeField] private float jumpSpeed = 6f;
-    [SerializeField] private int coins = 0;
+    [SerializeField] private TMP_Text coinsText;   
+
     private bool isGrounded;
     private float directionX;
     private Rigidbody2D rb;
@@ -12,27 +15,33 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        if (rb == null)
-            Debug.LogError("Rigidbody2D is null!");
+        if (rb == null) Debug.LogError("Rigidbody2D is null!");
+        if (coinsText == null) Debug.LogWarning("Coins Text (TMP) is not assigned.");
+
+        StartCoroutine(WaitAndInitUI());
+    }
+
+    private IEnumerator WaitAndInitUI()
+    {
+        while (GameManager.Instance == null) yield return null;
+        UpdateCoinsUI();
     }
 
     private void Update()
     {
         directionX = Input.GetAxis("Horizontal");
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) HandleJump();
+    }
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-            HandleJump();
+    private void FixedUpdate()
+    {
+        rb.linearVelocity = new Vector2(directionX * speed, rb.linearVelocity.y);
     }
 
     private void HandleJump()
     {
         isGrounded = false;
         rb.AddForce(Vector2.up * jumpSpeed, ForceMode2D.Impulse);
-    }
-
-    private void FixedUpdate()
-    {
-        rb.linearVelocity = new Vector2(directionX * speed, rb.linearVelocity.y);
     }
 
     private void OnCollisionEnter2D(Collision2D other)
@@ -52,16 +61,18 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Ground"))
             isGrounded = false;
     }
-  
+
     public void AddCoins()
     {
-        coins += 1;
-        Debug.Log($"Coins: {coins}");
+        if (GameManager.Instance != null)
+            GameManager.Instance.TryAddCoin();
+
+        UpdateCoinsUI();
     }
 
-    enum Movements
+    private void UpdateCoinsUI()
     {
-        Horizontal,
-        Vertical
-    } 
+        if (coinsText == null || GameManager.Instance == null) return;
+        coinsText.text = $"{GameManager.Instance.CollectedCoins}/{GameManager.Instance.TargetCoins}";
+    }
 }
