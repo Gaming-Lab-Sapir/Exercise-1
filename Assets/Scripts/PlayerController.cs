@@ -30,7 +30,10 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         directionX = Input.GetAxis("Horizontal");
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded) HandleJump();
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            HandleJump();
+        }
     }
 
     private void FixedUpdate()
@@ -47,26 +50,52 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Ground"))
-            isGrounded = true;
+        {
+            foreach (ContactPoint2D contact in other.contacts)
+            {
+                if (contact.point.y < transform.position.y - 0.1f)
+                {
+                    isGrounded = true;
+                    break;
+                }
+            }
+        }
     }
 
     private void OnCollisionStay2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Ground"))
-            isGrounded = true;
+        {
+            float playerBottom = GetComponent<Collider2D>().bounds.min.y;
+
+            foreach (ContactPoint2D contact in other.contacts)
+            {
+                if (contact.point.y <= playerBottom + 0.05f)
+                {
+                    isGrounded = true;
+                    return;
+                }
+            }
+
+            isGrounded = false;
+        }
     }
 
     private void OnCollisionExit2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Ground"))
+        {
             isGrounded = false;
+        }
+          
     }
 
     public void AddCoins()
     {
-        if (GameManager.Instance != null)
-            GameManager.Instance.TryAddCoin();
-
+        if (GameManager.Instance != null) 
+        { 
+            GameManager.Instance.TryAddCoin(); 
+        }
         UpdateCoinsUI();
     }
 
